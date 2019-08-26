@@ -1,4 +1,5 @@
 #include"bitree.h"
+#include"link.h"
 BiTree*biTree_init()
 {
 	BiTree*bitree;
@@ -21,22 +22,24 @@ BiTNode* init_bitNode(){
 	bitNode->rchild = NULL;
 	return bitNode;
 }
-int bitree_append(BiTree*bitree, char*name)
+int bitree_append(BiTree*bitree, char*userblack, char*userwhite,int*offset)
 {
 	BiTNode* bitnode,*tempnode;
 	int judge;
 	bitnode = init_bitNode();
 	tempnode = init_bitNode();
-	strncpy(bitnode->name, name,10);
-	
+	strncpy(bitnode->userblack, userblack, 10);
+	strncpy(bitnode->userwhite, userwhite, 10);
+	bitnode->offset =*offset;
 	if (bitree->curNode==NULL)
 	{
 		bitree->parentNode = bitnode;
 		bitree->curNode = bitnode;
 		return 1;
 	}
-	else{
-		judge = strcmp(name, bitree->curNode->name);
+	else
+	{
+		judge = strcmp(userblack, bitree->curNode->userblack);
 	}
 	if (judge > 0)
 	{
@@ -45,9 +48,10 @@ int bitree_append(BiTree*bitree, char*name)
 			bitree->curNode->lchild = bitnode;
 			return 1;
 		}
-		else{
+		else
+		{
 			bitree->curNode = bitree->curNode->lchild;
-			bitree_append(bitree, name);
+			bitree_append(bitree, userblack, userwhite,offset);
 		}
 	}
 	else if (judge<0)
@@ -59,28 +63,28 @@ int bitree_append(BiTree*bitree, char*name)
 		}
 		else{
 			bitree->curNode = bitree->curNode->rchild;
-			bitree_append(bitree,name);
+			bitree_append(bitree, userblack, userwhite,offset);
 		}
 	}
 	else {
-		if (judge == 0 && bitree->curNode->lchild != NULL)
+		if (judge == 0 && bitree->curNode->mchild != NULL)
 		{
 
-			tempnode = bitree->curNode->lchild;
-			bitree->curNode->lchild = bitnode;
-			bitree->curNode = bitree->parentNode->lchild;
-			bitree->curNode->lchild = tempnode;
+			tempnode = bitree->curNode->mchild;
+			bitree->curNode->mchild = bitnode;
+			bitree->curNode = bitree->curNode->mchild;
+			bitree->curNode->mchild = tempnode;
 			return 1;
 		}
 		else
 		{
-			bitree->curNode->lchild = bitnode;
+			bitree->curNode->mchild = bitnode;
 			return 1;
 		}
 	} 
 	return 1;
 }
-BiTNode* BiNode_find(BiTree*bitree, char*name)
+BiTNode* BiNode_find(BiTree*bitree, char*userblack, char*userwhite)
 {
 	
 	int judge;
@@ -90,19 +94,20 @@ BiTNode* BiNode_find(BiTree*bitree, char*name)
 	{
 		return bitree->curNode;
 	}
-	judge = strcmp(name, bitree->curNode->name);
+	judge = strcmp(userblack, bitree->curNode->userblack);
 	if (judge > 0)
 	{
 		bitree->curNode = bitree->curNode->lchild;
-		BiNode_find(bitree, name);
+		BiNode_find(bitree,userblack, userwhite);
 	}
 	else if (judge < 0)
 	{
 		bitree->curNode = bitree->curNode->rchild;
-		BiNode_find(bitree, name);
+		BiNode_find(bitree,userblack, userwhite);
 	}
 	else if(judge==0)
 	{
-		return bitree->curNode; // 返回不完整 ；加栈
+		Link*link;
+		return bitree->curNode; 
 	}
 }
